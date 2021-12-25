@@ -1,5 +1,20 @@
 const TweetsReducer = (state, action) => {
     switch (action.type) {
+      case "set_chart_data":
+        return {
+          ...state,
+          chartData: action.payload
+        };
+      case "set_word1":
+        return {
+          ...state,
+          word1: action.payload
+        };
+      case "set_word2":
+        return {
+          ...state,
+          word2: action.payload
+        };
       case "inc_counter1":
         return {
           ...state,
@@ -25,33 +40,40 @@ const TweetsReducer = (state, action) => {
           ...state,
           tweets1: [action.payload, ...state.tweets1],
           error: null,
-          isWaiting: false,
-          errors: [],
+          errors: []
         };
       case "clear_tweet1":
         return {
           ...state,
-          tweets1: [],
+          tweets1: []
         }
-        case "clear_tweet2":
-          return {
-            ...state,
-            tweets2: [],
-          }
       case "add_tweet2":
         return {
           ...state,
           tweets2: [action.payload, ...state.tweets2],
           error: null,
-          isWaiting: false,
           errors: [],
         };
+      case "clear_tweet2":
+        return {
+          ...state,
+          tweets2: []
+        }
+      case "update_submited":
+        return {
+          ...state,
+          isSubmitted: action.payload
+        }
       case "show_error":
-        return { ...state, error: action.payload, isWaiting: false };
+        return {
+          ...state,
+          error: action.payload,
+      };
       case "add_errors":
-        return { ...state, errors: action.payload, isWaiting: false };
-      case "update_waiting":
-        return { ...state, error: null, isWaiting: true };
+        return {
+          ...state,
+          errors: action.payload,
+        };
       default:
         return state;
     }

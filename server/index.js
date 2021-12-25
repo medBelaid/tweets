@@ -60,10 +60,11 @@ const streamTweets1 = (socket, term, isTheFirstTerm) => {
           }
         })
         .on("error", (error) => {
+          socket.emit("error", error);
           reconnect(socket, term, isTheFirstTerm);
         });
-    } catch (e) {
-      socket.emit("authError", "authMessage");
+    } catch (authMessage) {
+      socket.emit("authError", authMessage);
     }
   });
   
@@ -88,10 +89,11 @@ const streamTweets2 = (socket, term, isTheFirstTerm) => {
           }
         })
         .on("error", (error) => {
+          socket.emit("error", error);
           reconnect(socket, term, isTheFirstTerm);
         });
-    } catch (e) {
-      socket.emit("authError", "authMessage");
+    } catch (authMessage) {
+      socket.emit("authError", authMessage);
     }
   });
 };

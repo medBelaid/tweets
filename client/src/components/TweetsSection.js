@@ -1,17 +1,10 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import React, { useContext, useEffect } from "react";
 import io from "socket.io-client";
 import styled from "styled-components";
 import { CounterContext } from "../App";
-import TweetsReducer from "../reducers/TweetsReducer";
 import Spinner from "./Spinner";
 import Tweet from "./Tweet";
 
-const Container = styled.section`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
 const LISTS = styled.div`
   display: flex;
   overflow-y: auto;
@@ -22,21 +15,15 @@ const UL = styled.ul`
   flex: 0.5;
   list-style: none;
 `
+const ERROR = styled.p`
+  padding: 20px;
+  background-color: #f44336;
+  color: white;
+  text-align: center;
+`;
 const TweetsSection = () => {
-  const initialState = {
-    counter1: 0,
-    counter2: 0,
-    tweets1: [],
-    tweets2: [],
-    error: {},
-    isWaiting: true,
-  };
-
-  const [state, dispatch] = useReducer(TweetsReducer, initialState);
-  const { counter1, counter2, tweets1, tweets2, error, isWaiting } = state;
-  const [word1, setWord1, word2] = useContext(CounterContext);
-
-  const [rechartsData, setRechartsData] = useState([]);
+  const { state, dispatch } = useContext(CounterContext);
+  const { word1, word2, tweets1, tweets2, error, isSubmitted } = state;
 
   const streamTweets = () => {
     let socket = io("localhost:3002/");
@@ -61,63 +48,39 @@ const TweetsSection = () => {
   };
 
   useEffect(() => {
-    if (word1 !== '' && word2 !== '') {
+    if (isSubmitted) {
       streamTweets();
     }
-    setRechartsData([]);
+    dispatch({ type: 'set_chart_data', payload: [] });
     dispatch({ type: "init_counter1" });
     dispatch({ type: "init_counter2"});
     dispatch({ type: "clear_tweet1" });
     dispatch({ type: "clear_tweet2" });
-  }, [word1, word2]);
+  }, [word1, word2, isSubmitted]);
 
-  useEffect(() => {
-    setRechartsData(rechartsData.length > 6 ? [{
-      [word1]: (counter1 * 100) / (counter1 + counter2),
-      [word2]: (counter2 * 100) / (counter1 + counter2),
-    },...rechartsData] : [{
-      [word1]: (counter1 * 100) / (counter1 + counter2),
-      [word2]: (counter2 * 100) / (counter1 + counter2),
-    },...rechartsData].slice(0, 6))
-  }, [counter1, counter2, word1, word2])
-
+  // display tweets lists
   const showTweets = () => {
-    if (tweets1.length > 0 && tweets2.length > 0 && word1 !== '' && word2 !== '') {
       return (
-        <Container>
-          <LISTS>
-            <UL>
-              {tweets1.slice(0, 40).map((tweet, i) => (
+        <LISTS>
+          <UL>
+            {tweets1.slice(0, 40).map((tweet, i) => (
+              <Tweet key={i}>{tweet}</Tweet>
+            ))}
+          </UL>
+          <UL>
+              {tweets2.slice(0, 40).map((tweet, i) => (
                 <Tweet key={i}>{tweet}</Tweet>
               ))}
-            </UL>
-            <UL>
-                {tweets2.slice(0, 40).map((tweet, i) => (
-                  <Tweet key={i}>{tweet}</Tweet>
-                ))}
-            </UL>
-          </LISTS>
-          <LineChart
-              width={500}
-              height={300}
-              data={rechartsData}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey={word1} stroke="#8884d8" activeDot={{ r: 8 }} />
-              <Line type="monotone" dataKey={word2} stroke="#82ca9d" />
-            </LineChart>
-        </Container>
+          </UL>
+        </LISTS>
       );
-    }
   };
 
   return (
     <div>
-      {(tweets1.length === 0 || tweets2.length === 0)  &&  word1 !== '' && word2 !== '' ? <Spinner /> : showTweets()}
+      { (error && Object.keys(error).length !== 0 && isSubmitted ) && <ERROR>{error.source || error.code}</ERROR> }
+      {(isSubmitted && (tweets1.length === 0 || tweets2.length === 0)) && <Spinner />}
+      {(isSubmitted && tweets1.length > 0 && tweets2.length > 0) && showTweets()}
     </div>
   );
 };
