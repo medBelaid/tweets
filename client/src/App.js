@@ -1,4 +1,6 @@
 import { useState, createContext, useReducer } from 'react';
+import { ThemeProvider } from 'styled-components';
+import { theme } from './theme';
 import './App.css';
 import ChartSection from './components/ChartSection';
 import FieldsSection from './components/FieldsSection';
@@ -23,13 +25,15 @@ function App() {
 
   const [state, dispatch] = useReducer(TweetsReducer, initialState);
   return (
-    <CounterContext.Provider value={{ state, dispatch }}>
-      <div className="App">
-        <FieldsSection />
-        <TweetsSection />
-        <ChartSection />
-    </div>
-    </CounterContext.Provider>
+    <ThemeProvider theme={theme}>
+      <CounterContext.Provider value={{ state, dispatch }}>
+        <div className="App">
+          <FieldsSection />
+          <TweetsSection />
+          <ChartSection />
+      </div>
+      </CounterContext.Provider>
+    </ThemeProvider>
   );
 }
 

@@ -9,7 +9,7 @@ const LISTS = styled.div`
   display: flex;
   overflow-y: auto;
   height: 500px;
-  margin-bottom: 50px;
+  margin-bottom: ${({ theme }) => theme.space[5]};
 `;
 const UL = styled.ul`
   flex: 0.5;
@@ -17,7 +17,10 @@ const UL = styled.ul`
 `
 const ERROR = styled.p`
   padding: 20px;
-  background-color: #f44336;
+  margin: 0 20%;
+  border-radius: 6px;
+  background-color: ${({ theme }) => theme.colors.ui.error};
+  font-size: ${({ theme }) => theme.fontSizes.body};
   color: white;
   text-align: center;
 `;
@@ -77,11 +80,11 @@ const TweetsSection = () => {
   };
 
   return (
-    <div>
+    <>
       { (error && Object.keys(error).length !== 0 && isSubmitted ) && <ERROR>{error.source || error.code}</ERROR> }
       {(isSubmitted && (tweets1.length === 0 || tweets2.length === 0)) && <Spinner />}
       {(isSubmitted && tweets1.length > 0 && tweets2.length > 0) && showTweets()}
-    </div>
+    </>
   );
 };
 

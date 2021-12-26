@@ -14,36 +14,40 @@ const Fields = styled.div`
 `;
 const Buttons = styled.div`
     display: flex;
-    padding: 20px;
 `;
 const SubmitButton = styled.div`
     flex: 0.5;
     text-align: end;
-    padding: 20px;
+    padding: ${({ theme }) => theme.space[3]};
 `;
 
 const ResetButton = styled.div`
     flex: 0.5;
     text-align: start;
-    padding: 20px;
+    padding: ${({ theme }) => theme.space[3]};
 `;
 
 const Button = styled.button`
-    background: ${props => props.primary ? "palevioletred" : "white"};
-    color: ${props => props.primary ? "white" : "palevioletred"};
-    font-size: 1em;
-    margin: 1em;
+    background: ${({ primary, theme }) => primary ? theme.colors.bg.primary : theme.colors.bg.secondary};
+    color: ${({ primary, theme }) => primary ? theme.colors.bg.secondary : theme.colors.bg.primary};
+    font-size: ${({ theme }) => theme.fontSizes.body};
+    margin: ${({ theme }) => theme.space[1]};
     padding: 0.25em 1em;
-    border: 2px solid palevioletred;
+    border: 2px solid ${({ theme }) => theme.colors.bg.primary};
     border-radius: 3px;
     width: 100px;
     cursor: pointer;
+    :hover {
+        color: ${({ primary, theme }) => primary ? theme.colors.bg.primary : theme.colors.bg.secondary};
+        background: ${({ primary, theme }) => primary ? theme.colors.bg.secondary : theme.colors.bg.primary};
+        opacity: 0.7;
+    }
 `;
 
 const Input = styled.input`
-  padding: 0.5em;
-  margin: 0.5em;
+  padding: ${({ theme }) => theme.space[2]};
   color: #fdba4e;
+  font-size: ${({ theme }) => theme.fontSizes.body};
   background: #fdf6eb;
   border: 2px solid #fdba4e;
   border-radius: 3px;
