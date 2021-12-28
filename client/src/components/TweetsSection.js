@@ -25,11 +25,10 @@ const ERROR = styled.p`
   text-align: center;
 `;
 const TweetsSection = () => {
-  const { state, dispatch } = useContext(CounterContext);
+  const { state, dispatch, socket } = useContext(CounterContext);
   const { word1, word2, tweets1, tweets2, error, isSubmitted } = state;
 
   const streamTweets = () => {
-    let socket = io("localhost:3002/");
     socket.on("tweets1", (tweet) => {
       if (tweet) {
         dispatch({ type: "inc_counter1" });

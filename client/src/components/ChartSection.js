@@ -15,11 +15,11 @@ const ChartSection = () => {
     useEffect(() => {
       const c1 = (counter1 * 100) / (counter1 + counter2);
       const c2 = (counter2 * 100) / (counter1 + counter2);
-        dispatch({ type: 'set_chart_data', payload: chartData.length > 6 ? [{
+        dispatch({ type: 'set_chart_data', payload: chartData.length > 20 ? [{
           [word1]: c1, [word2]: c2
         },...chartData] : [{
           [word1]: c1, [word2]: c2
-        },...chartData].slice(0, 6) });
+        },...chartData].slice(0, 20) });
       }, [counter1, counter2, word1, word2])
 
     return (

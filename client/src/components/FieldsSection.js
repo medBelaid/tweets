@@ -59,12 +59,11 @@ const Input = styled.input`
 
 
 const FieldsSection = () => {
-  const { state, dispatch } = useContext(CounterContext);
+  const { state, dispatch, socket } = useContext(CounterContext);
   const { word1, word2 } = state;
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        const socket = io("localhost:3002/");
         socket.emit("send_tracks", {word1, word2});
         dispatch({ type: 'update_submited', payload: true });
     }
@@ -72,7 +71,6 @@ const FieldsSection = () => {
     const handleReset = () => {
         dispatch({ type: "set_word1", payload: '' });
         dispatch({ type: "set_word2", payload: '' });
-        const socket = io("localhost:3002/");
         socket.emit("destroy_streams");
         dispatch({ type: 'update_submited', payload: false });
     }
