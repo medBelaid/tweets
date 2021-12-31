@@ -1,5 +1,4 @@
 import React, { useContext, useEffect } from "react";
-import io from "socket.io-client";
 import styled from "styled-components";
 import { CounterContext } from "../App";
 import Spinner from "./Spinner";
