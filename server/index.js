@@ -28,30 +28,29 @@ const sleep = async (delay) => {
   return new Promise((resolve) => setTimeout(() => resolve(true), delay));
 };
 
-var _stream1 = null;
-var _stream2 = null;
+var _stream = null;
 
-const reconnect = async (socket, term, isTheFirstTerm) => {
+const reconnect = async (socket, term1, term2) => {
   timeout++;
   await sleep(2 ** timeout * 1000);
-  if (isTheFirstTerm) {
-    streamTweets1(socket, term, true);
-  } else {
-    streamTweets2(socket, term, false);
-  }
+  streamTweets(socket, term1, term2);
 };
-const streamTweets1 = (socket, term, isTheFirstTerm) => {
-  if (_stream1) {
-    _stream1.destroy();
+const streamTweets = (socket, term1, term2) => {
+  if (_stream) {
+    _stream.destroy();
   }
-  client.stream("statuses/filter", { track: term }, stream => {
-    _stream1 = stream;
+  client.stream("statuses/filter", { track: `${term1},${term2}` }, stream => {
+    _stream = stream;
     try {
-      _stream1
+      _stream
         .on("data", (data) => {
           try {
               if (data.text) {
-                socket.emit("tweets1", data.text);
+                if (data.text.includes(term1)) {
+                  socket.emit("tweets1", data.text);
+                } else if (data.text.includes(term2)) {
+                  socket.emit("tweets2", data.text);
+                }
               } else {
                 socket.emit("authError", data.text);
               }
@@ -61,36 +60,7 @@ const streamTweets1 = (socket, term, isTheFirstTerm) => {
         })
         .on("error", (error) => {
           socket.emit("error", error);
-          reconnect(socket, term, isTheFirstTerm);
-        });
-    } catch (authMessage) {
-      socket.emit("authError", authMessage);
-    }
-  });
-  
-};
-const streamTweets2 = (socket, term, isTheFirstTerm) => {
-  if (_stream2) {
-    _stream2.destroy();
-  }
-  client.stream("statuses/filter", { track: term }, stream => {
-    _stream2 = stream;
-    try {
-      _stream2
-        .on("data", (data) => {
-          try {
-              if (data.text) {
-                socket.emit("tweets2", data.text);
-              } else {
-                socket.emit("authError", data.text);
-              }
-            } catch (e) {
-            socket.emit("heartbeat");
-          }
-        })
-        .on("error", (error) => {
-          socket.emit("error", error);
-          reconnect(socket, term, isTheFirstTerm);
+          reconnect(socket, term1, term2);
         });
     } catch (authMessage) {
       socket.emit("authError", authMessage);
@@ -99,15 +69,12 @@ const streamTweets2 = (socket, term, isTheFirstTerm) => {
 };
 
 io.on("connection", (socket) => {
-  socket.on("send_tracks", async ({word1, word2}) => {
-    console.log(word1)
-    const w1 = await streamTweets1(io, word1, true);
-    const w2 = await streamTweets2(io, word2);
+  socket.on("send_tracks", ({word1, word2}) => {
+  streamTweets(io, word1, word2);
   });
 
   socket.on("destroy_streams", () => {
-    _stream1.destroy();
-    _stream2.destroy();
+    _stream.destroy();
   });
 
   socket.on("disconnect", () => {
